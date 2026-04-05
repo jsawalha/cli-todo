@@ -1,0 +1,11 @@
+[package]
+name = "cli-todo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+console = { version = "0.15"}
+dialoguer = "0.11"
+lazy_static = "1.4"
+rusqlite = { version = "0.29", features = ["bundled"] }
+comfy-table = "7.1"
