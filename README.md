@@ -2,6 +2,10 @@
 
 A command-line todo list application built with Rust and SQLite.
 
+##Demo
+
+[![asciicast](https://asciinema.org/a/900394.svg)](https://asciinema.org/a/900394)
+
 ## Features
 
 - Add todos with a title and description
