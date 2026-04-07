@@ -1,8 +1,8 @@
 // main.rs — entry point for the CLI todo app.
 // Reads command line arguments and calls the appropriate functions from lib.rs.
 
-use cli_todo::{EntryTodo, create_connection, delete, erase, help, list, toggle, verify_db};
-use std::env::args;
+use cli_todo::{EntryTodo, create_app_state, help, verify_db};
+use std::{env::args};
 use comfy_table::Table;
 
 fn main() {
@@ -18,11 +18,14 @@ fn main() {
     }
 
     // Open the database and ensure the table exists before doing anything
-    let conn = create_connection().expect("Failed to connect to the database");
-    verify_db(&conn).expect("Failed to verify the database");
+    let state = create_app_state().expect("Failed to create app state");
+    verify_db(&state).expect("Failed to verify the database");
+
 
     // Route to the correct function based on the first argument
-    match args[1].as_str() {
+    let args_response = args[1].to_lowercase();
+
+    match args_response.as_str() {
         // Build an EntryTodo from args and insert it into the DB
         "add" => {
             let todo = EntryTodo {
@@ -31,12 +34,12 @@ fn main() {
                 description: args[3].clone(),
                 completed: false,
             };
-            todo.add(&conn).unwrap();
+            todo.add(&state).unwrap();
         },
 
         // Fetch all todos and render them as a formatted table
         "list" => {
-            let listing = list(&conn).unwrap();
+            let listing = EntryTodo::list(&state).unwrap();
             let mut table = Table::new();
             table.set_header(vec!["ID", "Title", "Description", "Completed"]);
 
@@ -55,18 +58,18 @@ fn main() {
         // Parse the id argument and delete the matching row
         "delete" => {
             let id = args[2].parse::<i32>().unwrap();
-            delete(&conn, id).unwrap();
+            EntryTodo::delete(&state, id).unwrap();
         },
 
         // Parse the id argument and flip the completed status
         "toggle" => {
             let id = args[2].parse::<i32>().unwrap();
-            toggle(&conn, id).unwrap();
+            EntryTodo::toggle(&state, id).unwrap();
         },
 
         // Drop the entire table — permanently deletes all todos
         "erase" => {
-            erase(&conn).unwrap();
+            EntryTodo::erase(&state).unwrap();
         },
 
         "help" | "--help" | "-h" => { help(); },
